@@ -1,0 +1,49 @@
+Sub CompareLists()
+    Dim listSheet As Worksheet
+    Dim compareSheet As Worksheet
+    Dim listRow As Long
+    Dim compareRow As Long
+    Dim compareLastRow As Long
+    Dim compareData As Range
+    Dim listValue As String
+    Dim compareValue As String
+    Dim outputRow As Long
+    
+    Set listSheet = ThisWorkbook.Sheets("List1")
+    Set compareSheet = ThisWorkbook.Sheets("comparesheet")
+    
+    ' List1の最終行を取得
+    listRow = listSheet.Cells(listSheet.Rows.Count, "A").End(xlUp).Row
+    
+    ' comparesheetの最終行を取得
+    compareLastRow = compareSheet.Cells(compareSheet.Rows.Count, "A").End(xlUp).Row
+    
+    ' List1のデータを1行ずつ処理
+    For listRow = 1 To listRow
+        listValue = listSheet.Cells(listRow, "A").Value
+        
+        ' comparesheetのデータと比較
+        For compareRow = 1 To compareLastRow
+            compareValue = compareSheet.Cells(compareRow, "A").Value
+            
+            ' 文字情報が一致する場合
+            If compareValue = listValue Then
+                outputRow = Application.Match(compareValue, compareSheet.Columns("A"), 0)
+                
+                ' B列にList1の文字情報を出力
+                compareSheet.Cells(outputRow, "B").Value = listValue
+                
+                Exit For ' 一致する行が見つかったら終了
+            End If
+        Next compareRow
+        
+        ' 文字情報が一致しない場合
+        If compareRow > compareLastRow Then
+            compareSheet.Cells(compareLastRow + 1, "A").Value = listValue
+            compareSheet.Cells(compareLastRow + 1, "B").Value = listValue
+            compareLastRow = compareLastRow + 1
+        End If
+    Next listRow
+    
+    MsgBox "データの比較が完了しました。", vbInformation
+End Sub
